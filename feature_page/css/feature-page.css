@@ -1,0 +1,349 @@
+
+/* ========================================= PAGE ========================================= */
+.feature-page-odd, .feature-page-even {
+    margin: 30px 0px;
+    padding: 20px 0px;
+}
+.feature-page-odd {
+    background-color: #fff;
+}
+.feature-page-even {
+    background-color: #eee;
+}
+
+/* ========================================= CIRCLE ELEMENTS ========================================= */
+.feature-circle {
+    text-align: center;
+}
+.circle-element {
+    width: 198px;
+    height: auto;
+    display: inline-block;
+    margin: 10px 15px;
+    vertical-align:top;
+}
+.circle-element > a {
+  text-decoration:none !important;
+}
+.circle-image {
+    width: 198px;
+    height: 198px;
+    overflow: hidden;
+    border-radius: 99px;
+}
+.circle-image img {
+    width: 352px;
+    height: 198px;
+    margin-left: -77px;
+}
+.circle-text {
+    font-size: 25px;
+    color:black;
+    margin-top:10px;
+    padding: 0px 10px;
+}
+
+/* ========================================= LINK ELEMENTS ========================================= */
+.feature-link {
+	display:flex;
+	align-items:center;
+	text-align:center;
+}
+
+.link-element {
+    font-size: 22px;
+    flex:1;
+    padding:10px 20px;
+    cursor:pointer;
+    vertical-align:middle;
+    font-family: sans-serif;
+}
+.link-element-sub {
+    font-size: 14px;
+}
+.link-element-sub .fa {
+    font-size: 40px;
+    line-height: 55px;
+    margin-bottom: -5px;
+}
+
+.link-element a {
+	    color:rgb(75,75,75) !important;
+}
+
+@media screen and (max-width:1050px) {
+  .feature-link {
+  	display:block;
+  	padding:0px;
+  }
+	.link-element {
+		display:block;
+		width:auto;
+		margin:0px;
+		padding:15px;
+	}
+	.link-element:last-child { border:0px; }
+}
+
+/* ========================================= NARRATIVE ELEMENTS ========================================= */
+.feature-narrative {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 100;
+    line-height:30px;
+    margin: 20px 0px;
+}
+
+.feature-narrative p {
+  margin-bottom:20px;
+}
+
+.feature-narrative p:last-child {
+	margin:0px;
+}
+
+.narrative-title h1 {
+    font-size: 30px;
+    line-height:30px;
+    font-weight: 300;
+    margin: 0px 0px 20px 0px;
+}
+
+.narrative-text {
+    max-width: 700px;
+    margin: 0px auto;
+}
+
+.feature-narrative strong em u:hover, 
+.feature-narrative strong u em:hover , 
+.feature-narrative em strong u:hover ,
+.feature-narrative em u strong:hover ,
+.feature-narrative u strong em:hover ,
+.feature-narrative u em strong:hover  {
+    background-color: rgb(0, 34, 85);
+}
+
+.feature-narrative strong em u, 
+.feature-narrative strong u em, 
+.feature-narrative em strong u,
+.feature-narrative em u strong,
+.feature-narrative u strong em,
+.feature-narrative u em strong {
+    max-width: 350px;
+    width: 100%;
+    margin:10px 0px;
+    padding:4px 15px;
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 36px;
+    background-color: rgb(51, 102, 153);
+    color: #fff;
+    display: inline-block;
+    cursor: pointer;
+    font-style: normal;
+    text-decoration: none;
+}
+
+.feature-narrative ul,
+.feature-narrative ol  {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.feature-narrative li {
+    display: inline-block;
+    list-style: none;
+    text-align: center;
+    margin: 10px 20px;
+    font-size: 18px;
+    line-height: 20px;
+    
+}
+
+.feature-narrative blockquote {
+    font-size: 22px;
+    border: none;
+    quotes: "\201C""\201D""\2018""\2019";
+    text-align: left;
+    font-style: italic;
+    padding: 10px;
+    margin: 0px;
+}
+.feature-narrative blockquote:before {
+  color: #ddd;
+  content: open-quote;
+  font-size: 90px;
+  line-height: 0px;
+  margin-right: 5px;
+  vertical-align: -30px;
+}
+.feature-narrative blockquote p:first-child {
+  display: inline;
+}
+
+.feature-narrative blockquote p {
+  margin:0;
+}
+.feature-narrative blockquote:after {
+    color: #ddd;
+    content: close-quote;
+    font-size: 45px;
+    line-height: 0px;
+    margin-left:0px;
+    vertical-align: -14px;
+}
+.feature-narrative blockquote + em, 
+.feature-narrative blockquote + p>em {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 100;
+    font-style: normal;
+    text-align: left;
+}
+.feature-narrative blockquote + p {
+    text-align: left;
+}
+.feature-narrative blockquote + em:before,
+.feature-narrative blockquote + p>em:before {
+    content: "\2014";
+    margin-right: 6px;
+}
+
+
+/* ========================================= EVENT ELEMENTS ========================================= */
+.feature-event {
+    width: 100%;
+    text-align: center;
+    font-size: 25px;
+    font-weight: 400;
+    line-height:25px;
+    padding: 10px 0px 10px 0px;
+}
+
+
+/* ========================================= MOSAIC ELEMENTS ========================================= */
+.feature-mosaic {
+    box-sizing: border-box;
+    padding:0px;
+    border:0px;
+    width:100%;
+}
+.image-div {
+    width: 350px;
+    height: 250px;
+    display: inline-block;
+    margin: 0px;
+    box-sizing: border-box;
+    background-size: cover;
+    position: relative;
+}
+
+.mosaic-element-text {
+	font-size:20px;
+	color:white;
+	position:absolute;
+	bottom:0px;
+    padding: 6px 10px;
+    width: 100%;
+    font-weight: 400;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.mosaic-element-sub {
+    display: none;
+	font-size:16px;
+	color:white;
+	position:absolute;
+	bottom:0px;
+    padding: 6px 10px;
+    width: 100%;
+    font-weight: 400;
+    background-color: rgba(0,0,0,0.6);
+}
+
+
+
+/* ========================================= TILE ELEMENTS ========================================= */
+.tile-container {
+    width:100%;
+    padding: 10px 0px;
+}
+.feature-tile {
+    text-align: center;
+    padding:0px !important;
+}
+.feature-tile a {
+    text-decoration: none !important;
+}
+.tile-element {
+    display: inline-block;
+    margin: 10px;
+    background-color: #fff;
+    -moz-box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    vertical-align:top;
+    width:370px;
+}
+.tile-image img {
+    width: 100%;
+    height: auto;
+}
+
+.tile-title {
+    font-size: 22px;
+    padding: 0px 20px 0px 20px;
+    color: #444;
+}
+
+.tile-text {
+    font-size: 18px;
+    color: #444;
+    padding: 0px 20px 20px 20px;
+}
+
+
+
+@media screen and (max-width:500px) {
+  .tile-element {
+    width:calc(100% - 40px);
+  }
+}
+
+
+/* ================================== FEATURE PAGE UPDATES ================================== */    
+
+
+.feature-narrative strong em u, .feature-narrative strong u em, .feature-narrative em strong u, .feature-narrative em u strong, .feature-narrative u strong em, .feature-narrative u em strong {
+    padding: 4px 50px;
+    font-size: 20px;
+    -webkit-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.narrative-title h1 {
+    font-size: 32px;
+    line-height: 32px;
+}
+.tile-element h1 {
+    font-size: 32px;
+    font-weight: 300;
+}
+.tile-title {
+    padding: 0px 30px;
+}
+.tile-text {
+    padding: 0px 30px 30px 30px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

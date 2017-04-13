@@ -1,0 +1,99 @@
+<?php
+
+/* http://fredparke.com/blog/creating-content-types-and-fields-using-custom-module-drupal-7 */
+
+require_once('feature_page.field_base.inc');
+require_once('feature_page.field_instance.inc');
+
+
+/**
+ * Implements hook_install().
+ */
+function feature_page_install() {
+
+    // ================= ADD TAXONOMY =================
+    $tax = (object) array(
+                'name' => 'Feature Page Element Styles',
+                'machine_name' => 'feature_page_element_styles',
+                'description' => '',
+                'module' => 'taxonomy'
+            );
+    taxonomy_vocabulary_save($tax);
+    $vocab = taxonomy_vocabulary_machine_name_load('feature_page_element_styles');
+    if (isset($vocab->vid)) {
+        taxonomy_term_save((object) array('name' => 'Calendar Event',   'description' => 'feature-event',       'format' => 'plain_text', 'vid' => $vocab->vid));
+        taxonomy_term_save((object) array('name' => 'Circle Elements',  'description' => 'feature-circle',      'format' => 'plain_text', 'vid' => $vocab->vid));
+        taxonomy_term_save((object) array('name' => 'Content Tile',     'description' => 'feature-tile',        'format' => 'plain_text', 'vid' => $vocab->vid));
+        taxonomy_term_save((object) array('name' => 'Descriptive Text', 'description' => 'feature-narrative',   'format' => 'plain_text', 'vid' => $vocab->vid));
+        taxonomy_term_save((object) array('name' => 'Image Mosaic',     'description' => 'feature-mosaic',      'format' => 'plain_text', 'vid' => $vocab->vid));
+        taxonomy_term_save((object) array('name' => 'Simple Link',      'description' => 'feature-link',        'format' => 'plain_text', 'vid' => $vocab->vid));
+    }
+
+    node_types_rebuild();
+    
+    foreach (_feature_page_installed_fields() as $field) {
+        field_create_field($field);
+    }
+    foreach (_feature_page_installed_instances() as $fieldinstance) {
+        field_create_instance($fieldinstance);
+    }    
+ 
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function feature_page_uninstall() {
+    $nodeids = array();
+    
+    $type1 = 'feature_page';
+    $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+    $result = db_query($sql, array(':type' => $type1));
+    foreach ($result as $row) {
+        $nodeids[] = $row->nid;
+    }
+    $type2 = 'feature_page_group';
+    $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+    $result = db_query($sql, array(':type' => $type2));
+    foreach ($result as $row) {
+        $nodeids[] = $row->nid;
+    }
+    $type3 = 'feature_page_element';
+    $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+    $result = db_query($sql, array(':type' => $type3));
+    foreach ($result as $row) {
+        $nodeids[] = $row->nid;
+    }
+    
+    node_delete_multiple($nodeids);
+
+
+    foreach (array_keys(_feature_page_installed_fields()) as $field) {
+        field_delete_field($field);
+    }
+    $instances = field_info_instances('node', 'feature_page');
+    foreach ($instances as $instance_name => $fieldinstance) {
+        field_delete_instance($fieldinstance);
+    }
+    $instances = field_info_instances('node', 'feature_page_group');
+    foreach ($instances as $instance_name => $fieldinstance) {
+        field_delete_instance($fieldinstance);
+    }
+    $instances = field_info_instances('node', 'feature_page_element');
+    foreach ($instances as $instance_name => $fieldinstance) {
+        field_delete_instance($fieldinstance);
+    }
+    
+    node_type_delete($type1);
+    node_type_delete($type2);
+    node_type_delete($type3);
+    field_purge_batch(500);
+    
+    // ================= DELETE TAXONOMY =================
+    $vocab = taxonomy_vocabulary_machine_name_load('feature_page_element_styles');
+    if (isset($vocab->vid)) {
+        taxonomy_vocabulary_delete($vocab->vid);
+    }
+}
+
+

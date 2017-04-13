@@ -1,0 +1,460 @@
+<?php
+
+function feature_page_help($path, $arg){
+    switch($path){
+        case "admin/help#feature_page":
+            return '<p>' . t("Feature Page Block Module.") . '</p>';
+            break;
+    }
+}
+
+/**
+ * Implements hook_node_info()
+ */
+// ================ ADDS CONTENT TYPE - Feature Page ================
+function feature_page_node_info() {
+    
+  $items = array(
+    'feature_page' => array(
+      'name' => t('Feature Page'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'feature_page_element' => array(
+      'name' => t('Feature Page Element'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'feature_page_group' => array(
+      'name' => t('Feature Page Group'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+  );
+
+  return $items; 
+    
+}
+
+/**
+ * Implement hook_form()
+ */
+// ================ HOOK To ADD CONTENT FOR NEW TYPE - Feature Page ================
+function feature_page_form($node, $form_state) {
+    return node_content_form($node, $form_state);
+}
+
+
+// =========================== BLOCKS =========================== 
+/**
+ * Implements hook_block_info().
+ */
+function feature_page_block_info(){
+    $blocks['displayFeaturePage'] = array(
+        'info' => t("Feature Page Content"),
+        'cache' => DRUPAL_CACHE_PER_PAGE,
+    );
+    
+    return $blocks;
+}
+/**
+ *  Implements hook_block_view().
+ */
+function feature_page_block_view($block_name = ""){
+    switch ($block_name) {
+        case 'displayFeaturePage':
+            $block['subject'] = t("Feature Page Content");
+            $block['content'] = fpDisplayFeaturePage();
+            return $block;
+            
+    }
+}
+
+function fpDisplayFeaturePage() {
+
+    $path = drupal_get_path("module", "feature_page");
+    drupal_add_css($path . "/css/feature-page.css", "file");
+    
+    $html = '';
+    // ===================== GET FEATURE PAGE =====================  
+    $query = new EntityFieldQuery(); 
+    $query  ->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', 'feature_page')
+            ->propertyCondition('status', NODE_PUBLISHED)
+            ->propertyOrderBy('title', 'ASC')
+            ->range(0, 1);
+    $result = $query->execute();
+    $fpNids = (!empty($result['node'])) ? array_keys($result['node']) : array();  
+    
+    $grpCnt = 0;
+    foreach($fpNids as $nid) {
+        $pageNode = node_load($nid);
+        $groups = isset($pageNode->field_feature_page_element_group[LANGUAGE_NONE]) ? $pageNode->field_feature_page_element_group[LANGUAGE_NONE] : array();
+        foreach($groups as $group) {
+            $groupNid = isset($group["target_id"]) ? $group["target_id"] : -1;
+            if ($groupNid > 0) {
+                $groupNode = node_load($groupNid);
+                $elements = isset($groupNode->field_feature_page_group_element[LANGUAGE_NONE]) ? $groupNode->field_feature_page_group_element[LANGUAGE_NONE] : array();
+                $elemNids = array();
+                foreach($elements as $element) {
+                    $elemNid = isset($element["target_id"]) ? $element["target_id"] : -1;
+                    if ($elemNid > 0) {
+                        $elemNids[] = $elemNid;
+                    }
+                }
+                $groupTID = isset($groupNode->field_feature_page_group_style[LANGUAGE_NONE][0]["tid"]) ? $groupNode->field_feature_page_group_style[LANGUAGE_NONE][0]["tid"] : -1;
+                $groupTAX = taxonomy_term_load($groupTID);
+                $groupNAM = isset($groupTAX->name) ? $groupTAX->name : "";
+                $groupSTY = isset($groupTAX->description) ? trim($groupTAX->description) : "";
+
+                switch($groupSTY) {
+                    case "feature-event":       $markup = fpEvent($elemNids,"feature-event")         ; break;
+                    case "feature-circle":      $markup = fpCircle($elemNids,"feature-circle")       ; break;
+                    case "feature-tile":        $markup = fpTile($elemNids,"feature-tile")           ; break;
+                    case "feature-narrative":   $markup = fpNarrative($elemNids,"feature-narrative") ; break;
+                    case "feature-mosaic":      $markup = fpMosaic($elemNids,"feature-mosaic")       ; break;
+                    case "feature-link":        $markup = fpLink($elemNids,"feature-link")           ; break;
+                    default:                    $markup = ""; break;
+                }
+                if ($markup != "") {
+                    ++$grpCnt;
+                    $grpClass = (($grpCnt%2) == 0) ? "even" : "odd";
+                    $html.="<section class='feature-page-${grpClass}'>${markup}</section>";
+                }
+
+            }
+            
+        }
+    }
+    
+	$output = array (
+		'#type' => 'markup',
+		'#prefix' => '<div class="feature-page">',
+		'#markup' => $html,
+		'#suffix' => '</div>',
+		);
+	return $output; 
+    
+}
+
+function fpEvent($nids,$class) {
+
+    $now = time();
+    $next = $now + (365*24*60*60);
+    
+    $cnt = 0;
+    $event = "";
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $text = isset($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) : "";
+        $eoDay = isset($node->field_feature_page_end_date[LANGUAGE_NONE][0]["value"])    ? (intval($node->field_feature_page_end_date[LANGUAGE_NONE][0]["value"]) + 86400) : 0;
+        $timeDiff = $eoDay - $now;
+        
+        if (($text != "") && ($timeDiff < $next) && ($timeDiff > 0)) {
+            $event = "<i class='fa fa-calendar' aria-hidden='true'></i>&nbsp;&nbsp;${text}";
+            $next = $timeDiff;
+            ++$cnt;
+        }
+    }
+    $html = "<div class='event-container'>";
+    $html.= "<div class='container ${class}'>";
+    $html.= $event;
+    $html.= "</div>";
+    $html.= "</div>";
+    
+    if ($cnt > 0) {
+        return $html;
+    } else {
+        return "";
+    }
+    
+}
+
+function fpCircle($nids,$class) {
+
+    $html = "<div class='circle-container'>";
+    $html.= "<div class='container ${class}'>";
+    $cnt = 0;
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $title = isset($node->title) ? trim($node->title) : "";
+        $link = isset($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) : "";
+        $imgURI = isset($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) ? trim($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) : "";
+        $imgURL = file_create_url($imgURI);
+        
+        if (($title != "") && ($imgURI != "")) {
+            $target = (stripos($link,"http") === 0) ? " target='_blank'": "";
+            $html.= "<div class='circle-element'><a href='${link}'${target}><div class='circle-image'><img src='${imgURL}' alt='${title}'></div><div class='circle-text'>${title}</div></a></div>";
+            ++$cnt;
+        }
+
+    }
+    $html.= "</div>";
+    $html.= "</div>";
+    
+    if ($cnt > 0) {
+        return $html;
+    } else {
+        return "";
+    }
+    
+}
+
+function fpTile($nids,$class) {
+
+    $html = "<div class='tile-container'>";
+    $html.= "<div class='container ${class}'>";
+    $cnt = 0;
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $title = isset($node->title) ? trim($node->title) : "";
+        $text = isset($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) : "";
+        $link = isset($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) : "";
+        $imgURI = isset($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) ? trim($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) : "";
+        $imgURL = file_create_url($imgURI);
+        
+        if (($text != "") && ($imgURI != "")) {
+            $target = (stripos($link,"http") === 0) ? " target='_blank'": "";
+            $html.= "<div class='tile-element'><a href='${link}'${target}><div class='tile-image'><img src='${imgURL}' alt='${title}'></div><div class='tile-title'><h1>${title}</h1></div><div class='tile-text'>${text}</div></a></div>";
+            ++$cnt;
+        }
+    }
+    $html.= "</div>";
+    $html.= "</div>";
+    
+    if ($cnt > 0) {
+        return $html;
+    } else {
+        return "";
+    }
+
+}
+
+function fpNarrative($nids,$class) {
+
+    $html = "<div class='narrative-container'>";
+    $html.= "<div class='container ${class}'>";
+    $cnt = 0;
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $title = isset($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) : "";
+        $body = isset($node->field_feature_page_narrative[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_narrative[LANGUAGE_NONE][0]["value"]) : "";
+        if ($body != "") {
+            if ($title != "") {
+                $html.= "<div class='narrative-title'><h1>${title}</h1></div><div class='narrative-text'>${body}</div>";
+            } else {
+                $html.= "<div class='narrative-text'>${body}</div>";
+            }
+            ++$cnt;
+        }
+    }
+    $html.= "</div>";
+    $html.= "</div>";
+    
+    if ($cnt > 0) {
+        return $html;
+    } else {
+        return "";
+    }
+    
+}
+
+function fpMosaic($nids,$class) {
+
+    $rand = mt_rand(1000000,9999999);
+    $html = "<div class='mosaic-container'>";
+    $html.= "<div class='container ${class}' id='mosaic-box-${rand}'>";
+    $cnt = 0;
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $title = isset($node->title) ? trim($node->title) : "";
+        $link = isset($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) : "";
+        $text = isset($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) : "";
+        $imgURI = isset($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) ? trim($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) : "";
+        $imgURL = file_create_url($imgURI);
+        
+        if (($title != "") && ($imgURI != "")) {
+            ++$cnt;
+            $sub = "";
+            if ($text != "") {
+                $sub = "<div class='mosaic-element-sub'>${text}</div>";
+            }                 
+            $target = (stripos($link,"http") === 0) ? " target='_blank'": "";
+        $html.= "<a href='${link}'${target}><div class='mosaic-element image-div' style='background-image: url(${imgURL})'><div class='mosaic-element-text'>${title}</div>${sub}</div></a>";
+        }
+        
+    }
+    $html.= "</div>";
+    $html.= "</div>";
+
+$js=<<<JS
+    (function ($) { jQuery(document).ready(function($) {
+        var three = [[40,25,35],[25,35,40],[35,40,25]];
+        var two = [[45,55],[55,45]];
+        var margin = 8;
+        var cHigh = 250;
+        var total = ${cnt};
+        
+        var ratio = cHigh * 16/9;
+        var marRig = margin;
+        var marBtm = margin-6;
+    
+        function reFlow(divID) {
+       
+            var pWide = $("#" + divID).width();
+            var cWide = 0;
+            var cnt=0,row=0,div=0,x=0,y=0,sum=0;
+            $("#" + divID + " .image-div").each(function(){
+                
+                    if (pWide > 900) {
+                        div = 3;
+                        x = (Math.floor(cnt/div))%div;
+                        y = (row%div);
+                        ++row;
+                        ++cnt;
+
+                        if ((row == div) || (cnt == total))  { 
+                            row = 0;
+                            cWide = pWide - sum;
+                            marRig = 0;
+                            sum = 0;
+                        } else {
+                            marRig = margin;
+                            cWide = Math.floor(pWide * three[x][y] / 100) - marRig;
+                            sum += cWide + marRig;
+                        }
+                        
+                    } else if (pWide > 500) {
+                        div = 2;
+                        x = (Math.floor(cnt/div))%div;
+                        y = (row%div);
+                        ++row;
+                        ++cnt;
+                        
+                        if ((row == div) || (cnt == total))  {
+                            row = 0;
+                            cWide = pWide - sum;
+                            marRig = 0;
+                            sum = 0;
+                        } else {
+                            marRig = margin;
+                            cWide = Math.floor(pWide * two[x][y] / 100) - marRig;
+                            sum += cWide + marRig;
+                        }
+                        
+                    } else {
+                        cWide = pWide;
+                        ++cnt;
+                        row = 0;
+                    }
+                
+                    if (cWide >= ratio) { $(this).css({"background-repeat":"no-repeat","background-position":"center center","background-size":cWide+"px auto"}); } 
+                    else { $(this).css({"background-repeat":"no-repeat","background-position":"center center","background-size":"auto 250px"}); }
+                    $(this).css({"height":cHigh+"px","width":cWide+"px","margin-right":marRig+"px","margin-bottom":marBtm+"px"});
+                
+            });
+        }
+
+        $(window).resize(function(){
+            reFlow("mosaic-box-${rand}");
+        });
+        reFlow("mosaic-box-${rand}");
+
+        $(".image-div").mouseover(function(){
+            $(this).has('.mosaic-element-sub').find('.mosaic-element-text').css({'display':'none'});
+            $(this).find('.mosaic-element-sub').css({'display':'block'});
+        });
+        $(".image-div").mouseout(function(){
+            $(this).find('.mosaic-element-text').css({'display':'block'});
+            $(this).find('.mosaic-element-sub').css({'display':'none'});
+        });
+        
+    }); }(jQuery));    
+JS;
+    
+    if ($cnt > 0) {
+        drupal_add_js($js, 'inline');
+        return $html;
+    } else {
+        return "";
+    }
+
+}
+
+function fpLink($nids,$class) {
+
+    $html = "<div class='link-container'>";
+    $html.= "<div class='container ${class}'>";
+    $cnt=0;
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $title = isset($node->title) ? trim($node->title) : "";
+        $text = isset($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) : "";
+        $link = isset($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) : "";
+        $imgURI = isset($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) ? trim($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) : "";
+        $imgURL = file_create_url($imgURI);
+                
+        if (($title != "") && ($link != "")) {
+            $target = (stripos($link,"http") === 0) ? " target='_blank'": "";
+            $sub = "";
+            if ($text != "") {
+                $text = preg_replace('/::([a-zA-Z0-9\-]*)::/','<i class="fa ${1}" aria-hidden="true"></i><br>',$text);
+                $sub = "<br><span class='link-element-sub'>${text}</span>";
+            }
+            $html.= "<div class='link-element'><a href='${link}'${target}>${title}${sub}</a></div>";
+            ++$cnt;
+        }
+        
+    }
+    $html.= "</div>";
+    $html.= "</div>";
+    
+    if ($cnt > 0) {
+        return $html;
+    } else {
+        return "";
+    }
+    
+}
+
+
+// =========================== MENU - EXTRA PAGES =========================== 
+/*
+ * 
+ * Implementation of hook_menu()
+ */
+function feature_page_menu() {
+    $items = array();
+
+    $items['Cover'] = array(
+        'title' => 'View',
+        'page callback' => 'fpCover',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK, 
+    );
+
+    return $items;
+}
+
+function fpCover() {
+   
+	$output = array (
+		'#type' => 'markup',
+		'#prefix' => '',
+		'#markup' => '',
+		'#suffix' => '',
+		);
+	return $output; 
+    
+}
+
+
