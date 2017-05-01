@@ -117,6 +117,7 @@ function fpDisplayFeaturePage() {
                 $groupSTY = isset($groupTAX->description) ? trim($groupTAX->description) : "";
 
                 switch($groupSTY) {
+                    case "feature-block":       $markup = fpBlock($elemNids,"feature-block")         ; break;
                     case "feature-event":       $markup = fpEvent($elemNids,"feature-event")         ; break;
                     case "feature-circle":      $markup = fpCircle($elemNids,"feature-circle")       ; break;
                     case "feature-tile":        $markup = fpTile($elemNids,"feature-tile")           ; break;
@@ -135,7 +136,7 @@ function fpDisplayFeaturePage() {
             
         }
     }
-    
+   
 	$output = array (
 		'#type' => 'markup',
 		'#prefix' => '<div class="feature-page">',
@@ -143,6 +144,47 @@ function fpDisplayFeaturePage() {
 		'#suffix' => '</div>',
 		);
 	return $output; 
+    
+}
+
+function fpBlock($nids,$class) {
+
+    $result = db_query("SELECT module, delta FROM block WHERE module != 'system' GROUP BY delta ORDER BY delta");
+    $blocksArray = array();
+    foreach($result as $row) {
+        $module = trim($row->module);
+        $delta = trim($row->delta);
+        $token = "[:${module}::${delta}:]";
+        $blocksArray[$token]['module'] = $module;
+        $blocksArray[$token]['delta'] = $delta;
+    }
+   
+    $cnt = 0;
+    $block = "";
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $token = isset($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) : "";
+        if ($token != "") {
+            if (isset($blocksArray[$token]['module']) && isset($blocksArray[$token]['delta'])) {
+                $rendBlock = module_invoke($blocksArray[$token]['module'], 'block_view', $blocksArray[$token]['delta']);
+                if (isset($rendBlock['content'])) {
+                    $block = is_array($rendBlock['content']) ? render($rendBlock['content']) : "";
+                    ++$cnt;
+                }
+            }
+        }
+    }
+    $html = "<div class='insert-block-container'>";
+    $html.= "<div class='container ${class}'>";
+    $html.= $block;
+    $html.= "</div>";
+    $html.= "</div>";
+    
+    if ($cnt > 0) {
+        return $html;
+    } else {
+        return "";
+    }
     
 }
 
@@ -442,7 +484,37 @@ function feature_page_menu() {
         'type' => MENU_CALLBACK, 
     );
 
+    $items['admin/config/content/feature_page'] = array(
+        'title' => 'Feature Page Config',
+        'description' => 'Configuration for Feature Page module',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('feature_page_tokens_form'),
+        'access arguments' => array('access administration pages'),
+        'type' => MENU_NORMAL_ITEM,
+    );
+    
     return $items;
+}
+
+function feature_page_tokens_form($form, &$form_state) {
+    $result = db_query("SELECT module, delta FROM block WHERE module != 'system' GROUP BY delta ORDER BY delta");
+    $html = "<table>";
+    $html.= "<tr><th>Block</th><th>Token</th></tr>";
+    foreach($result as $row) {
+        $module = trim($row->module);
+        $delta = trim($row->delta);
+        $build = module_invoke($module, 'block_view', $delta);
+        $subject = isset($build['subject']) ? trim($build['subject']) : $delta;
+        $token = "[:${module}::${delta}:]";
+        $html.="<tr><td>${subject}</td><td>${token}</td></tr>";
+    }
+    $html.="</table>";
+    
+    $form['token_block_placer_TOKENS'] = array(
+        '#markup' => "<div class='form-item'><label>Available Tokens</label>${html}</div>"
+    );
+
+    return system_settings_form($form);
 }
 
 function fpCover() {

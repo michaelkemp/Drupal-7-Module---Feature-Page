@@ -2,7 +2,9 @@ name = Feature Page
 description = Feature Page Block Module
 package = Feature Page
 core = 7.x
-version = 2.27
+version = 2.35
+
+configure = admin/config/content/feature_page
 
 dependencies[] = date
 dependencies[] = entityreference

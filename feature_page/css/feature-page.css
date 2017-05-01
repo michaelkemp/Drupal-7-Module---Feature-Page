@@ -313,8 +313,12 @@
 
 /* ================================== FEATURE PAGE UPDATES ================================== */    
 
-
-.feature-narrative strong em u, .feature-narrative strong u em, .feature-narrative em strong u, .feature-narrative em u strong, .feature-narrative u strong em, .feature-narrative u em strong {
+.feature-narrative strong em u, 
+.feature-narrative strong u em, 
+.feature-narrative em strong u, 
+.feature-narrative em u strong, 
+.feature-narrative u strong em, 
+.feature-narrative u em strong {
     padding: 4px 50px;
     font-size: 20px;
     -webkit-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

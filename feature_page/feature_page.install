@@ -21,6 +21,7 @@ function feature_page_install() {
     taxonomy_vocabulary_save($tax);
     $vocab = taxonomy_vocabulary_machine_name_load('feature_page_element_styles');
     if (isset($vocab->vid)) {
+        taxonomy_term_save((object) array('name' => 'Insert Block',     'description' => 'feature-block',       'format' => 'plain_text', 'vid' => $vocab->vid));
         taxonomy_term_save((object) array('name' => 'Calendar Event',   'description' => 'feature-event',       'format' => 'plain_text', 'vid' => $vocab->vid));
         taxonomy_term_save((object) array('name' => 'Circle Elements',  'description' => 'feature-circle',      'format' => 'plain_text', 'vid' => $vocab->vid));
         taxonomy_term_save((object) array('name' => 'Content Tile',     'description' => 'feature-tile',        'format' => 'plain_text', 'vid' => $vocab->vid));
