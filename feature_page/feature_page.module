@@ -148,17 +148,19 @@ function fpDisplayFeaturePage() {
 }
 
 function fpBlock($nids,$class) {
-
-    $result = db_query("SELECT module, delta FROM block WHERE module != 'system' GROUP BY delta ORDER BY delta");
+    module_load_include('inc', 'block', 'block.admin');
+    global $theme_key;
+    $ableBlocks = block_admin_display_prepare_blocks($theme_key);
+    
     $blocksArray = array();
-    foreach($result as $row) {
-        $module = trim($row->module);
-        $delta = trim($row->delta);
+    foreach($ableBlocks as $block) {
+        $module = isset($block["module"]) ? trim($block["module"]) : "";
+        $delta = isset($block["delta"]) ? trim($block["delta"]) : "";
         $token = "[:${module}::${delta}:]";
         $blocksArray[$token]['module'] = $module;
         $blocksArray[$token]['delta'] = $delta;
     }
-   
+  
     $cnt = 0;
     $block = "";
     foreach($nids as $nid) {
@@ -168,16 +170,18 @@ function fpBlock($nids,$class) {
             if (isset($blocksArray[$token]['module']) && isset($blocksArray[$token]['delta'])) {
                 $rendBlock = module_invoke($blocksArray[$token]['module'], 'block_view', $blocksArray[$token]['delta']);
                 if (isset($rendBlock['content'])) {
-                    $block = is_array($rendBlock['content']) ? render($rendBlock['content']) : "";
-                    ++$cnt;
+                    if (is_array($rendBlock['content'])) {
+                        $block.= "<div class='container ${class}'>";
+                        $block.= render($rendBlock['content']);
+                        $block.= "</div>";
+                        ++$cnt;
+                    }
                 }
             }
         }
     }
     $html = "<div class='insert-block-container'>";
-    $html.= "<div class='container ${class}'>";
     $html.= $block;
-    $html.= "</div>";
     $html.= "</div>";
     
     if ($cnt > 0) {
@@ -497,16 +501,18 @@ function feature_page_menu() {
 }
 
 function feature_page_tokens_form($form, &$form_state) {
-    $result = db_query("SELECT module, delta FROM block WHERE module != 'system' GROUP BY delta ORDER BY delta");
+    module_load_include('inc', 'block', 'block.admin');
+    global $theme_key;
+    $ableBlocks = block_admin_display_prepare_blocks($theme_key);
+    
     $html = "<table>";
     $html.= "<tr><th>Block</th><th>Token</th></tr>";
-    foreach($result as $row) {
-        $module = trim($row->module);
-        $delta = trim($row->delta);
-        $build = module_invoke($module, 'block_view', $delta);
-        $subject = isset($build['subject']) ? trim($build['subject']) : $delta;
+    foreach($ableBlocks as $block) {
+        $module = isset($block["module"]) ? trim($block["module"]) : "";
+        $delta = isset($block["delta"]) ? trim($block["delta"]) : "";
+        $info = isset($block["info"]) ? trim($block["info"]) : "";
         $token = "[:${module}::${delta}:]";
-        $html.="<tr><td>${subject}</td><td>${token}</td></tr>";
+        $html.="<tr><td>${info}</td><td>${token}</td></tr>";
     }
     $html.="</table>";
     
