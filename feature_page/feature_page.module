@@ -167,7 +167,7 @@ function fpBlock($nids,$class) {
     foreach($nids as $nid) {
         $node = node_load($nid);
         $token = isset($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_description[LANGUAGE_NONE][0]["value"]) : "";
-        if ($token != "") {
+        if (($token != "") && (stripos($token,"[:feature_page:") === FALSE)) {
             if (isset($blocksArray[$token]['module']) && isset($blocksArray[$token]['delta'])) {
                 $rendBlock = module_invoke($blocksArray[$token]['module'], 'block_view', $blocksArray[$token]['delta']);
                 if (isset($rendBlock['content'])) {
