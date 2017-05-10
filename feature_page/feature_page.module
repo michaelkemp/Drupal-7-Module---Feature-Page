@@ -99,6 +99,7 @@ function fpDisplayFeaturePage($nid) {
     
     $html = '';
     
+    $grpCnt = 0;
     $pageNode = node_load($nid);
     $groups = isset($pageNode->field_feature_page_element_group[LANGUAGE_NONE]) ? $pageNode->field_feature_page_element_group[LANGUAGE_NONE] : array();
     foreach($groups as $group) {
