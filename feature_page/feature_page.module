@@ -1,11 +1,49 @@
 <?php
 
 function feature_page_help($path, $arg){
+    module_load_include('inc', 'block', 'block.admin');
+    global $theme_key;
+    $ableBlocks = block_admin_display_prepare_blocks($theme_key);
+    
+    $tokens = "<table>";
+    $tokens.= "<tr><th>Block</th><th>Token</th></tr>";
+    foreach($ableBlocks as $block) {
+        $module = isset($block["module"]) ? trim($block["module"]) : "";
+        $delta = isset($block["delta"]) ? trim($block["delta"]) : "";
+        $info = isset($block["info"]) ? trim($block["info"]) : "";
+        $token = "[:${module}::${delta}:]";
+        $tokens.="<tr><td>${info}</td><td>${token}</td></tr>";
+    }
+    $tokens.="</table>";
+
+$html=<<<HTML
+
+<h2>Feature Page Block Module</h2>
+<p>This modules uses a simple content type in a complex fashion to allow for many layouts.</p>
+<hr><br>
+<h3>Content Matrix</h3>
+<table>
+    <tr><th>&nbsp;</th>             <th>Title</th>   <th>Description</th>     <th>Image</th>   <th>Narrative Text</th>  <th>URL</th>     <th>End Date</th></tr>
+    <tr><td>Insert Block</td>       <td> </td>       <td>x</td>               <td> </td>       <td> </td>               <td> </td>       <td> </td></tr>
+    <tr><td>Calendar Event</td>     <td> </td>       <td>x</td>               <td> </td>       <td> </td>               <td> </td>       <td>x</td></tr>
+    <tr><td>Circle Elements</td>    <td>x</td>       <td> </td>               <td>x</td>       <td> </td>               <td>x</td>       <td> </td></tr>
+    <tr><td>Content Tile</td>       <td>x</td>       <td>x</td>               <td>x</td>       <td> </td>               <td>x</td>       <td> </td></tr>
+    <tr><td>Descriptive Text</td>   <td> </td>       <td>x</td>               <td> </td>       <td>x</td>               <td> </td>       <td> </td></tr>
+    <tr><td>Image Mosaic</td>       <td>x</td>       <td>x</td>               <td>x</td>       <td> </td>               <td>x</td>       <td> </td></tr>
+    <tr><td>Simple Link</td>        <td>x</td>       <td>x</td>               <td>x</td>       <td> </td>               <td>x</td>       <td> </td></tr>
+</table>
+<hr><br>
+<h3>Block Tokens</h3>
+${tokens}
+
+HTML;
+    
     switch($path){
         case "admin/help#feature_page":
-            return '<p>' . t("Feature Page Block Module.") . '</p>';
+            return $html;
             break;
     }
+    
 }
 
 /**
@@ -489,40 +527,8 @@ function feature_page_menu() {
         'access arguments' => array('access content'),
         'type' => MENU_CALLBACK, 
     );
-
-    $items['admin/config/content/feature_page'] = array(
-        'title' => 'Feature Page Config',
-        'description' => 'Configuration for Feature Page module',
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('feature_page_tokens_form'),
-        'access arguments' => array('access administration pages'),
-        'type' => MENU_NORMAL_ITEM,
-    );
     
     return $items;
-}
-
-function feature_page_tokens_form($form, &$form_state) {
-    module_load_include('inc', 'block', 'block.admin');
-    global $theme_key;
-    $ableBlocks = block_admin_display_prepare_blocks($theme_key);
-    
-    $html = "<table>";
-    $html.= "<tr><th>Block</th><th>Token</th></tr>";
-    foreach($ableBlocks as $block) {
-        $module = isset($block["module"]) ? trim($block["module"]) : "";
-        $delta = isset($block["delta"]) ? trim($block["delta"]) : "";
-        $info = isset($block["info"]) ? trim($block["info"]) : "";
-        $token = "[:${module}::${delta}:]";
-        $html.="<tr><td>${info}</td><td>${token}</td></tr>";
-    }
-    $html.="</table>";
-    
-    $form['token_block_placer_TOKENS'] = array(
-        '#markup' => "<div class='form-item'><label>Available Tokens</label>${html}</div>"
-    );
-
-    return system_settings_form($form);
 }
 
 function fpCover() {
