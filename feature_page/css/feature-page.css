@@ -36,8 +36,15 @@
     height: 198px;
     margin-left: -77px;
 }
-.circle-text {
+.circle-title {
     font-size: 25px;
+    line-height: 28px;
+    color:black;
+    margin-top:10px;
+    padding: 0px 10px;
+}
+.circle-text {
+    font-size: 14px;
     color:black;
     margin-top:10px;
     padding: 0px 10px;
