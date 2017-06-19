@@ -99,7 +99,7 @@ function feature_page_form($node, $form_state) {
 function feature_page_block_info(){
     $blocks = array();
     
-    $result = db_query("SELECT * FROM node WHERE (type = 'feature_page') AND (status = 1)");
+    $result = db_query("SELECT * FROM {node} WHERE (type = 'feature_page') AND (status = 1)");
     foreach($result as $row) {
         $title = trim($row->title);
         $nid = intval($row->nid);
@@ -117,7 +117,7 @@ function feature_page_block_info(){
 function feature_page_block_view($block_name = ""){
     $block = array();
     
-    $result = db_query("SELECT * FROM node WHERE (type = 'feature_page') AND (status = 1)");
+    $result = db_query("SELECT * FROM {node} WHERE (type = 'feature_page') AND (status = 1)");
     foreach($result as $row) {
         $title = trim($row->title);
         $nid = intval($row->nid);

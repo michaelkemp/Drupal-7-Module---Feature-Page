@@ -2,7 +2,7 @@ name = Feature Page
 description = Feature Page Block Module
 package = Feature Page
 core = 7.x
-version = 2.53
+version = 2.54
 
 configure = admin/config/content/feature_page
 
