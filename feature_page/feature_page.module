@@ -398,7 +398,9 @@ $js=<<<JS
     
         function reFlow(divID) {
        
-            var pWide = $("#" + divID).width();
+            // Account for margin difference (this happens with containers in bootstrap)
+            var pMarg = parseInt($("#" + divID).css("marginLeft").replace("px","")) - parseInt($("#" + divID).css("marginRight").replace("px",""));
+            var pWide = $("#" + divID).width() - pMarg;
             var cWide = 0;
             var cnt=0,row=0,div=0,x=0,y=0,sum=0;
             $("#" + divID + " .image-div").each(function(){
