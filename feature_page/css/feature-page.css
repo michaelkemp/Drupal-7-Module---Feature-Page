@@ -110,8 +110,8 @@
 }
 
 .narrative-title h1 {
-    font-size: 30px;
-    line-height:30px;
+    font-size: 32px;
+    line-height:32px;
     font-weight: 300;
     margin: 0px 0px 20px 0px;
 }
@@ -122,10 +122,10 @@
 }
 
 .feature-narrative strong em u:hover, 
-.feature-narrative strong u em:hover , 
-.feature-narrative em strong u:hover ,
-.feature-narrative em u strong:hover ,
-.feature-narrative u strong em:hover ,
+.feature-narrative strong u em:hover, 
+.feature-narrative em strong u:hover,
+.feature-narrative em u strong:hover,
+.feature-narrative u strong em:hover,
 .feature-narrative u em strong:hover  {
     background-color: rgb(0, 34, 85);
 }
@@ -136,11 +136,13 @@
 .feature-narrative em u strong,
 .feature-narrative u strong em,
 .feature-narrative u em strong {
+    white-space: nowrap;
+    text-align:center;
     max-width: 350px;
     width: 100%;
     margin:10px 0px;
-    padding:4px 15px;
-    font-size: 26px;
+    padding: 4px 0px;
+    font-size: 20px;
     font-weight: 400;
     line-height: 36px;
     background-color: rgb(51, 102, 153);
@@ -149,6 +151,8 @@
     cursor: pointer;
     font-style: normal;
     text-decoration: none;
+    -webkit-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .feature-narrative ul,
@@ -292,6 +296,12 @@
     vertical-align:top;
     width:370px;
 }
+
+.tile-element h1 {
+    font-size: 32px;
+    font-weight: 300;
+}
+
 .tile-image img {
     width: 100%;
     height: auto;
@@ -299,17 +309,15 @@
 
 .tile-title {
     font-size: 22px;
-    padding: 0px 20px 0px 20px;
+    padding: 0px 30px;
     color: #444;
 }
 
 .tile-text {
     font-size: 18px;
     color: #444;
-    padding: 0px 20px 20px 20px;
+    padding: 0px 30px 30px 30px;
 }
-
-
 
 @media screen and (max-width:500px) {
   .tile-element {
@@ -317,35 +325,131 @@
   }
 }
 
+/* ================================== FEATURE PAGE ARTICLE ================================== */    
 
-/* ================================== FEATURE PAGE UPDATES ================================== */    
+h2.fp-article-title {
+    color: #002e5f;
+    border-bottom: 2px solid #99999d;
+    width: 100%;
+    margin-top: 0px;
+}
 
-.feature-narrative strong em u, 
-.feature-narrative strong u em, 
-.feature-narrative em strong u, 
-.feature-narrative em u strong, 
-.feature-narrative u strong em, 
-.feature-narrative u em strong {
-    padding: 4px 50px;
+.fp-article-text {
+    text-align: left;
+    font-size: 1.2em;
+    line-height: 1.5em;
+}
+
+.feature-article table {
+    margin-bottom: 3em;
+}
+
+.feature-article table{
+    width:100%;
+}
+
+.feature-article tbody{
+    border-top: none;
+}
+
+td.fp-article-image-wrapper {
+    width: 6.5em;
+}
+.fp-article-right td.fp-article-image-wrapper {
+    padding-right: 3em;
+}
+.fp-article-left td.fp-article-image-wrapper {
+    padding-left: 3em;
+}
+
+.fp-article-img-container {
+    width:100%;
+    height:100%;
+    overflow: hidden;
+    padding-top: 0.5em;
+    padding-bottom: 2em;
+}
+
+.fp-article-img-container img {
+    width:178.125%;
+    height:auto;
+    margin-left: -21.875%
+}
+
+
+.fp-article-right td.fp-article-title-text-wrapper {
+    text-align: right;
+}
+
+td.fp-article-title-text-wrapper {
+    width: 20em;
+    vertical-align: top;
+}
+
+
+.fp-article-middle{
+    display:none;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 0.9em;
+    padding-bottom: 3em;
+}
+
+.fp-article-title{
+    text-align:left;
+}
+
+td.fp-article-image-wrapper {
+    padding-top: 0;
+    vertical-align: top;
+}
+
+.feature-article strong em u:hover, 
+.feature-article strong u em:hover, 
+.feature-article em strong u:hover,
+.feature-article em u strong:hover,
+.feature-article u strong em:hover,
+.feature-article u em strong:hover  {
+    background-color: rgb(0, 34, 85);
+}
+
+.feature-article strong em u, 
+.feature-article strong u em, 
+.feature-article em strong u,
+.feature-article em u strong,
+.feature-article u strong em,
+.feature-article u em strong {
+    white-space: nowrap;
+    text-align:center;
+    max-width: 350px;
+    width: 100%;
+    margin:10px 0px;
+    padding: 4px 0px;
     font-size: 20px;
+    font-weight: 400;
+    line-height: 36px;
+    background-color: rgb(51, 102, 153);
+    color: #fff;
+    display: inline-block;
+    cursor: pointer;
+    font-style: normal;
+    text-decoration: none;
     -webkit-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.narrative-title h1 {
-    font-size: 32px;
-    line-height: 32px;
-}
-.tile-element h1 {
-    font-size: 32px;
-    font-weight: 300;
-}
-.tile-title {
-    padding: 0px 30px;
-}
-.tile-text {
-    padding: 0px 30px 30px 30px;
-}
 
+@media(max-width: 992px){
+    .fp-article-table{
+        display: none;
+    }
+    .fp-article-middle{
+        display: block;
+    }
+    .fp-article-text {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+}
 
 
 

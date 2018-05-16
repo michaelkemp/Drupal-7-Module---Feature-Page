@@ -31,6 +31,7 @@ $html=<<<HTML
     <tr><td>Descriptive Text</td>   <td> </td>       <td>x</td>               <td> </td>       <td>x</td>               <td> </td>       <td> </td></tr>
     <tr><td>Image Mosaic</td>       <td>x</td>       <td>x</td>               <td>x</td>       <td> </td>               <td>x</td>       <td> </td></tr>
     <tr><td>Simple Link</td>        <td>x</td>       <td>x</td>               <td>x</td>       <td> </td>               <td>x</td>       <td> </td></tr>
+    <tr><td>Feature Article</td>    <td>x</td>       <td> </td>               <td>x</td>       <td>x</td>               <td>x</td>       <td> </td></tr>
 </table>
 <hr><br>
 <h3>Block Tokens</h3>
@@ -165,6 +166,7 @@ function fpDisplayFeaturePage($nid) {
                 case "feature-narrative":   $markup = fpNarrative($elemNids,"feature-narrative") ; break;
                 case "feature-mosaic":      $markup = fpMosaic($elemNids,"feature-mosaic")       ; break;
                 case "feature-link":        $markup = fpLink($elemNids,"feature-link")           ; break;
+                case "feature-article":     $markup = fpArticle($elemNids,"feature-article")     ; break;
                 default:                    $markup = ""; break;
             }
             if ($markup != "") {
@@ -327,6 +329,67 @@ function fpTile($nids,$class) {
 
 }
 
+function fpArticle($nids,$class) {
+
+    $html = "<div class='narrative-container'>";
+    $html.= "<div class='container ${class}'>";
+    $cnt = rand(1,2);
+    $table = "";
+    $vertl = "";
+    foreach($nids as $nid) {
+        $node = node_load($nid);
+        $title = isset($node->title) ? trim($node->title) : "";
+        $text = isset($node->field_feature_page_narrative[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_narrative[LANGUAGE_NONE][0]["value"]) : "";
+        $link = isset($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) ? trim($node->field_feature_page_url[LANGUAGE_NONE][0]["value"]) : "";
+        $imgURI = isset($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) ? trim($node->field_feature_page_image[LANGUAGE_NONE][0]["uri"]) : "";
+        $imgURL = file_create_url($imgURI);
+
+        if (trim($link) == "") {
+            $image = "<div class='fp-article-img-container'><img class='fp-article-image' src='${imgURL}'></div>";
+        } else {
+            $target = (stripos($link,"http") === 0) ? " target='_blank'": "";
+            $image = "<a href='${link}' ${target}><div class='fp-article-img-container'><img class='fp-article-image' src='${imgURL}'></div></a>";
+        }
+
+        if (($cnt % 2) == 0) {
+            $table.="<table class='fp-article-table fp-article-table-left'>";
+            $table.="   <tr class='fp-article fp-article-left'>";
+            $table.="       <td class='fp-article-title-text-wrapper'><h2 class='fp-article-title'>${title}</h2><div class='fp-article-text'>${text}</div></td>";
+            $table.="       <td class='fp-article-image-wrapper'>${image}</td>";
+            $table.="   </tr>";
+            $table.="</table>";
+        } else {
+            $table.="<table class='fp-article-table fp-article-table-right'>";
+            $table.="   <tr class='fp-article fp-article-right'>";
+            $table.="       <td class='fp-article-image-wrapper'>${image}</td>";
+            $table.="       <td class='fp-article-title-text-wrapper'><h2 class='fp-article-title'>${title}</h2><div class='fp-article-text'>${text}</div></td>";
+            $table.="   </tr>";
+            $table.="</table>";
+        }
+
+        $vertl.="<div class='fp-article fp-article-middle'>";
+        $vertl.="    <h2 class='fp-article-title'>${title}</h2>";
+        $vertl.="    ${image}";
+        $vertl.="    <div class='fp-article-text'>${text}</div>";
+        $vertl.="</div>";
+
+        ++$cnt;
+    }
+
+    $html.= $table;
+    $html.= $vertl;
+
+    $html.= "</div>";
+    $html.= "</div>";
+    
+    if ($cnt > 0) {
+        return $html;
+    } else {
+        return "";
+    }
+    
+}
+
 function fpNarrative($nids,$class) {
 
     $html = "<div class='narrative-container'>";
@@ -398,9 +461,11 @@ $js=<<<JS
     
         function reFlow(divID) {
        
-            // Account for margin difference (this happens with containers in bootstrap)
-            var pMarg = parseInt($("#" + divID).css("marginLeft").replace("px","")) - parseInt($("#" + divID).css("marginRight").replace("px",""));
-            var pWide = $("#" + divID).width() - pMarg;
+            // Account for margin difference (this happens with containers in bootstrap) -- Maybe things changed - this doesn't seem to be needed [Mar 2018]
+            //var pMarg = parseInt($("#" + divID).css("marginLeft").replace("px","")) - parseInt($("#" + divID).css("marginRight").replace("px",""));
+            //var pWide = $("#" + divID).width() - pMarg;
+
+            var pWide = $("#" + divID).width();
             var cWide = 0;
             var cnt=0,row=0,div=0,x=0,y=0,sum=0;
             $("#" + divID + " .image-div").each(function(){

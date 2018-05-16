@@ -28,6 +28,7 @@ function feature_page_install() {
         taxonomy_term_save((object) array('name' => 'Descriptive Text', 'description' => 'feature-narrative',   'format' => 'plain_text', 'vid' => $vocab->vid));
         taxonomy_term_save((object) array('name' => 'Image Mosaic',     'description' => 'feature-mosaic',      'format' => 'plain_text', 'vid' => $vocab->vid));
         taxonomy_term_save((object) array('name' => 'Simple Link',      'description' => 'feature-link',        'format' => 'plain_text', 'vid' => $vocab->vid));
+        taxonomy_term_save((object) array('name' => 'Feature Article',  'description' => 'feature-article',     'format' => 'plain_text', 'vid' => $vocab->vid));
     }
 
     node_types_rebuild();
